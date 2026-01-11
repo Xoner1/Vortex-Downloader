@@ -2,7 +2,7 @@ name: Build Vortex App
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -12,9 +12,20 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            sep: ';'
+            icon: 'assets/icon.ico'
+          - os: macos-latest
+            sep: ':'
+            icon: 'assets/icon.png'
+          - os: ubuntu-latest
+            sep: ':'
+            icon: 'assets/icon.png'
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -27,40 +38,19 @@ jobs:
         pip install -r requirements.txt
 
     
-    
-   
-    - name: Download FFmpeg (Windows)
-      if: runner.os == 'Windows'
+    - name: Setup FFmpeg (Auto-Download)
       run: |
-        curl -L -o assets/ffmpeg.exe https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.exe
+        python get_ffmpeg.py
 
-   
-    - name: Download FFmpeg (Mac/Linux)
-      if: runner.os != 'Windows'
+    - name: Build Application (PyInstaller)
       run: |
-        
-        curl -L -o assets/ffmpeg https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl
-        chmod +x assets/ffmpeg
-
-    # --------------------------------------
-
-    - name: Build Windows EXE
-      if: runner.os == 'Windows'
-      run: |
-        pyinstaller --name Vortex --onefile --windowed --icon=assets/icon.ico --add-data "assets;assets" main.py
-
-    - name: Build macOS APP
-      if: runner.os == 'macOS'
-      run: |
-        pyinstaller --name Vortex --onefile --windowed --icon=assets/icon.icns --add-data "assets:assets" main.py
-
-    - name: Build Linux Binary
-      if: runner.os == 'Linux'
-      run: |
-        pyinstaller --name Vortex --onefile --windowed --icon=assets/icon.png --add-data "assets:assets" main.py
+        pyinstaller --name Vortex --onefile --windowed --clean \
+        --icon="${{ matrix.icon }}" \
+        --add-data "assets${{ matrix.sep }}assets" \
+        main.py
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Vortex-${{ matrix.os }}
+        name: Vortex-App-${{ matrix.os }}
         path: dist/
