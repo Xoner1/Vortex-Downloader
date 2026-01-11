@@ -6,13 +6,13 @@ import tarfile
 import shutil
 import ssl
 
-
+# Fix SSL context for macOS
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def download_file(url, dest_path):
     print(f"Downloading from {url}...")
     try:
-      
+        # User-Agent to avoid 403 Forbidden
         req = urllib.request.Request(
             url, 
             data=None, 
@@ -49,26 +49,23 @@ def setup_ffmpeg():
                     break
         os.remove(zip_path)
 
-    # 2. macOS Setup (Updated Link)
+    # 2. macOS Setup
     elif sys.platform == "darwin":
         print("Detected System: macOS")
-       
         url = "https://evermeet.cx/ffmpeg/getrelease/zip"
         zip_path = "ffmpeg_mac.zip"
         download_file(url, zip_path)
         
         print("Extracting...")
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        
             for file in zip_ref.namelist():
-                if file.endswith("ffmpeg"): 
+                if file.endswith("ffmpeg"):
                     source = zip_ref.open(file)
                     target = open(os.path.join("assets", "ffmpeg"), "wb")
                     with source, target:
                         shutil.copyfileobj(source, target)
                     break
         
-      
         if os.path.exists(os.path.join("assets", "ffmpeg")):
             os.chmod(os.path.join("assets", "ffmpeg"), 0o755)
             print("Permissions set.")
@@ -94,7 +91,8 @@ def setup_ffmpeg():
                     break
         os.remove(tar_path)
 
-    print("✅ FFmpeg setup complete in 'assets/' folder.")
+    
+    print("[OK] FFmpeg setup complete in 'assets/' folder.")
 
 if __name__ == "__main__":
     setup_ffmpeg()
