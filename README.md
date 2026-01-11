@@ -4,8 +4,11 @@
 
 # Vortex Downloader 🌀
 
-**Fast. Secure. Private.**
+**Fast. Secure. Universal.**
 <br>
+*Developed by Fakhr eddine Farhat (Xoner1)*
+
+
 *The ultimate tool to download video & audio from the web.*
 
 [Report Bug](https://github.com/Xoner1/Vortex-Downloader/issues) · [Request Feature](https://github.com/Xoner1/Vortex-Downloader/issues)
