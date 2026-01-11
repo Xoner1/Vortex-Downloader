@@ -17,12 +17,15 @@ jobs:
           - os: windows-latest
             sep: ';'
             icon: 'assets/icon.ico'
+            ext: 'exe'
           - os: macos-latest
             sep: ':'
-            icon: 'assets/icon.png'
+            icon: 'assets/icon.icns' 
+            ext: 'app'
           - os: ubuntu-latest
             sep: ':'
             icon: 'assets/icon.png'
+            ext: ''
 
     steps:
       - name: Checkout Code
@@ -42,10 +45,18 @@ jobs:
         run: python get_ffmpeg.py
 
       - name: Build Application
-        run: pyinstaller --name Vortex --onefile --windowed --clean --icon="${{ matrix.icon }}" --add-data "assets${{ matrix.sep }}assets" main.py
+        run: pyinstaller --name Vortex --onefile --windowed --clean --noconfirm --icon="${{ matrix.icon }}" --add-data "assets${{ matrix.sep }}assets" main.py
+
+      
+      - name: Cleanup macOS Build
+        if: matrix.os == 'macos-latest'
+        run: |
+          rm -f dist/Vortex
+        
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Vortex-App-${{ matrix.os }}
-          path: dist/
+          
+          path: dist/Vortex.${{ matrix.ext }}
