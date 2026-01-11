@@ -63,9 +63,6 @@ Drag the `Vortex.app` file into your `Applications` folder.
 mv ~/Downloads/Vortex.app /Applications/
 
 
-
-Markdown
-
 # Vortex Downloader 🌀
 
 ![Vortex Logo](assets/icon.png)
