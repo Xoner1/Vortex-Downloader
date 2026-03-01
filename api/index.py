@@ -53,10 +53,7 @@ async def extract_metadata(request: ExtractRequest):
         'no_warnings': True,
         'format': 'bestvideo[height<=2160]+bestaudio/best', # up to 4K
         'sponsorblock_mark': 'all',
-        'nocheckcertificate': True,
-        'geo_bypass': True,
         'extract_flat': 'in_playlist',
-        'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt'),
         'extractor_args': {
             'youtube': {
                 'player_client': ['android', 'ios'],
@@ -70,6 +67,11 @@ async def extract_metadata(request: ExtractRequest):
             'Sec-Fetch-Mode': 'navigate',
         }
     }
+
+    # Only add cookiefile if it exists on disk (avoids Read-only FS error on Vercel)
+    cookie_path = os.path.join(os.path.dirname(__file__), 'cookies.txt')
+    if os.path.exists(cookie_path):
+        ydl_opts['cookiefile'] = cookie_path
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
