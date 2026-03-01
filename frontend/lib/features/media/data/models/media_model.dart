@@ -13,13 +13,16 @@ class MediaModel extends MediaItem {
 
   factory MediaModel.fromJson(Map<String, dynamic> json) {
     return MediaModel(
-      id: json['id'] ?? json['video_url'] ?? 'unknown', // Generate ID based on URL if none provided
+      id:
+          json['id'] ??
+          json['video_url'] ??
+          'unknown', // Generate ID based on URL if none provided
       title: json['title'] ?? 'Unknown Media',
       artist: json['artist'] ?? 'Unknown Artist',
       thumbnail: json['thumbnail'] ?? '',
       audioUrl: json['audio_url'] ?? '',
       videoUrl: json['video_url'] ?? '',
-      duration: json['duration'] ?? 0,
+      duration: (json['duration'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -31,7 +34,7 @@ class MediaModel extends MediaItem {
       thumbnail: json['thumbnail'] as String,
       audioUrl: json['audioUrl'] as String,
       videoUrl: json['videoUrl'] as String,
-      duration: json['duration'] as int,
+      duration: (json['duration'] as num).toInt(),
     );
   }
 
