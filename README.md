@@ -7,7 +7,7 @@
 **Fast. Secure. Universal.**
 <br>
 *Developed by Fakhr eddine Farhat (Xoner1)*
-
+*Modern UI rebuilt with Flutter & FastAPI Backend*
 
 *The ultimate tool to download video & audio from the web.*
 
@@ -17,17 +17,51 @@
 
 ---
 
-## 📥 Download Latest Version
+## 🏗️ Architecture
 
-Get the standalone app for your system (No Python required).
+Vortex has been completely rewritten using a modern stack:
+- **Frontend**: A fast, responsive desktop UI built with **Flutter**.
+- **Backend**: A high-performance background download server powered by **Python FastAPI** and **yt-dlp**.
 
-| Platform | Download Link | Status |
-| :--- | :--- | :--- |
-| **Windows** 🪟 | **[Download .exe](https://github.com/Xoner1/Vortex-Downloader/actions/runs/20902701939/artifacts/5091878451)** | ✅ Tested (Win 10/11) |
-| **macOS** 🍎 | **[Download .zip](https://github.com/Xoner1/Vortex-Downloader/actions/runs/20902701939/artifacts/5091877063)** | ✅ Tested (Intel & Silicon) |
-| **Linux** 🐧 | **[Download Binary](https://github.com/Xoner1/Vortex-Downloader/actions/runs/20902701939/artifacts/5091876816)** | ✅ Tested (Ubuntu/Debian) |
+## 📥 Getting Started (Development)
 
-> *Check the [Releases Page](https://github.com/Xoner1/Vortex-Downloader/releases) for older versions.*
+To run the application, you need to start both the Python backend and the Flutter frontend.
+
+### 1. Backend Setup (FastAPI)
+
+1. Navigate to the `backend` folder:
+   ```bash
+   cd backend
+   ```
+2. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run the setup script to download FFmpeg:
+   ```bash
+   python get_ffmpeg.py
+   ```
+4. Start the backend server:
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8000
+   ```
+   The backend will start running on `http://localhost:8000`.
+
+### 2. Frontend Setup (Flutter)
+
+1. Make sure you have [Flutter installed](https://docs.flutter.dev/get-started/install).
+2. Open a new terminal and navigate to the `frontend` folder:
+   ```bash
+   cd frontend
+   ```
+3. Install Flutter dependencies:
+   ```bash
+   flutter pub get
+   ```
+4. Run the desktop application (e.g., on macOS/Windows/Linux):
+   ```bash
+   flutter run -d macos  # Replace with windows or linux depending on your OS
+   ```
 
 ---
 
@@ -42,58 +76,6 @@ This isn't just another downloader. Vortex is built for quality and privacy.
 * ♾️ **Unlimited:** No daily limits, no paywalls. Open Source & Free.
 
 ---
-
-## 📸 Screenshots
-
-<div align="center">
-
-### Clean Interface
-*Simple, dark-themed UI designed for focus.*
-<br>
-<img src="assets/main_ui.png" width="450" alt="Main Interface">
-
-<br><br>
-
-### macOS Compatibility
-*Note: Dual icons may appear briefly during processing on Mac.*
-<br>
-<img src="assets/mac_dock.png" width="450" alt="macOS Dock">
-
-</div>
-
----
-
-## 🛠️ Installation & Troubleshooting
-
-### 🪟 Windows
-1.  Download `Vortex-Windows.exe`.
-2.  Double-click to run.
-3.  *SmartScreen Warning?* Click **More Info** > **Run Anyway**.
-
-### 🍎 macOS (Must Read)
-Since I am an indie developer, the app is not signed by Apple. You need to allow it once.
-
-**1. Move to Applications:**
-Drag the `Vortex.app` to your `Applications` folder.
-
-**2. Fix "Unidentified Developer":**
-* **Method A (Settings):** Go to **System Settings** > **Privacy & Security** > Scroll down and click **"Open Anyway"**.
-* **Method B (Terminal - Instant Fix):**
-    ```bash
-    sudo xattr -rd com.apple.quarantine /Applications/Vortex.app
-    ```
-
-### 🐧 Linux
-Make the file executable and run it:
-   ```bash
-    chmod +x Vortex-Linux
-./Vortex-Linux
-  ```
-
-
-
-
-<br> ---
 
 ## 📬 Feedback & Support
 
