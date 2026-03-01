@@ -20,8 +20,8 @@
 ## 🏗️ Architecture
 
 Vortex has been completely rewritten using a modern stack:
-- **Frontend**: A fast, responsive desktop UI built with **Flutter**.
-- **Backend**: A high-performance background download server powered by **Python FastAPI** and **yt-dlp**.
+- **Frontend**: A fast, responsive cross-platform UI built with **Flutter** (supports iOS, Android, and Desktop). Features include SponsorBlock, native Passcode Lock, Arabic localization, and background audio support.
+- **Backend**: A Vercel-compatible cloud-native API server powered by **Python FastAPI** and **yt-dlp**. It extracts direct 4K streaming URLs without downloading files to the server.
 
 ## 📥 Getting Started (Development)
 
@@ -69,11 +69,12 @@ To run the application, you need to start both the Python backend and the Flutte
 
 This isn't just another downloader. Vortex is built for quality and privacy.
 
-* 🚀 **Hybrid Engine:** Smartly switches between **Direct Stream Copy** (Instant speed) and **Robust Conversion** (Maximum compatibility) to ensure every download works.
-* 📺 **Universal Compatibility:** All videos are processed to **H.264/AAC**, ensuring they play on any device (iPhone, Smart TV, QuickTime) without needing VLC.
-* 🔒 **Privacy First:** No tracking, no data collection, no external servers. Everything runs locally on your machine.
-* 🎧 **Smart Audio:** Auto-extracts and converts audio to high-quality **MP3 (192kbps)**.
-* ♾️ **Unlimited:** No daily limits, no paywalls. Open Source & Free.
+* 🚀 **Cloud Streaming Engine:** Directly extracts and streams video/audio using caching, bypassing server-side downloads completely.
+* 📺 **Universal Compatibility:** Stream up to 4K resolutions or choose 'Audio Only' mode.
+* 🔒 **Privacy First:** Built-in Passcode Lock for your offline downloaded files.
+* 🎧 **Background Audio:** Full support for minimizing the app and continuing playback (via Android WakeLocks and iOS/macOS Audio Session).
+* ⏭️ **SponsorBlock Integration:** Automatically extracts chapter metadata.
+* 🌍 **Multilingual:** Beautiful interface rendered natively in Arabic using Google Fonts Cairo.
 
 ---
 

@@ -23,3 +23,10 @@ Thumbs.db
 
 assets/ffmpeg
 assets/ffmpeg.exe
+backend/assets/
+frontend/build/
+.dart_tool/
+frontend/linux/
+frontend/windows/
+frontend/web/
+frontend/macos/
