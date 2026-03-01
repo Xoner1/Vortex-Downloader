@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,12 +28,36 @@ class _HomeScreenState extends State<HomeScreen> {
     FocusScope.of(context).unfocus(); // Dismiss keyboard
 
     final provider = Provider.of<MediaProvider>(context, listen: false);
-    final media = await provider.extractMedia(url);
 
-    if (media != null && mounted) {
-      _showOptionsSheet(media);
-    } else if (provider.error != null && mounted) {
-      _showError(provider.error!);
+    try {
+      // Haptic Feedback for Apple Polish
+      HapticFeedback.lightImpact();
+
+      final media = await provider.extractMedia(url);
+
+      if (!mounted) return;
+
+      if (media != null) {
+        // Save to local history automatically
+        await provider.saveToHistory(media);
+
+        // Immediate Navigation to PlayerScreen on success
+        if (mounted) {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => PlayerScreen(
+                media: media,
+                isAudioOnly: false, // Defaulting to video stream, can be toggleable later
+              ),
+            ),
+          );
+        }
+      } else {
+        _showError(provider.error ?? 'Failed to extract media data.');
+      }
+    } catch (e) {
+      if (mounted) _showError(e.toString());
     }
   }
 
@@ -106,15 +131,11 @@ class _HomeScreenState extends State<HomeScreen> {
       final filename = "${safeTitle}_${DateTime.now().millisecondsSinceEpoch}.$ext";
       final savePath = '${downloadDir.path}/$filename';
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Downloading started in background...'), backgroundColor: Color(0xFF1C1C1E)),
-      );
+      _showGlassmorphismSnackBar('Downloading started in background...');
 
       // Using Dio for download
       Dio().download(downloadUrl, savePath).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text('Download Complete! Saved to: $filename'), backgroundColor: const Color(0xFF30D158)),
-        );
+        _showGlassmorphismSnackBar('Download Complete! Saved to: $filename');
       }).catchError((e) {
         _showError('Download Failed: $e');
       });
@@ -124,8 +145,37 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showError(String message) {
+    _showGlassmorphismSnackBar(message, isError: true);
+  }
+
+  void _showGlassmorphismSnackBar(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message, style: const TextStyle(color: Colors.white)), backgroundColor: Colors.redAccent)
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        content: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isError
+                    ? Colors.redAccent.withOpacity(0.3)
+                    : const Color(0xFF1C1C1E).withOpacity(0.8),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white12, width: 0.5),
+              ),
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
