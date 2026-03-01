@@ -54,6 +54,9 @@ async def extract_metadata(request: ExtractRequest):
         'format': 'bestvideo[height<=2160]+bestaudio/best', # up to 4K
         'sponsorblock_mark': 'all',
         'extract_flat': 'in_playlist',
+        'cachedir': False, # Critical for Vercel Read-only FS
+        'nocheckcertificate': True,
+        'geo_bypass': True,
         'extractor_args': {
             'youtube': {
                 'player_client': ['android', 'ios'],
