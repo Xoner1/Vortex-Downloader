@@ -1,0 +1,6 @@
+frontend/
+.venv/
+.dart_tool/
+build/
+android/
+ios/
