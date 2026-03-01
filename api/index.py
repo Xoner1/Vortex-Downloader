@@ -56,6 +56,12 @@ async def extract_metadata(request: ExtractRequest):
         'nocheckcertificate': True,
         'geo_bypass': True,
         'extract_flat': 'in_playlist',
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'ios'],
+                'skip': ['webpage']
+            }
+        },
         'http_headers': {
             'User-Agent': random.choice(user_agents),
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
