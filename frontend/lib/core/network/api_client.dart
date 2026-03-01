@@ -9,8 +9,18 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          // Spoof User-Agent for Vercel/YouTube extraction bypass
-          options.headers['User-Agent'] = _getRandomSafariUserAgent();
+          // Robust Browser Headers to bypass Vercel/YouTube 401s
+          options.headers.addAll({
+            'User-Agent': _getRandomSafariUserAgent(),
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Connection': 'keep-alive',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'Origin': baseUrl,
+            'Referer': '$baseUrl/',
+          });
           return handler.next(options);
         },
       ),
