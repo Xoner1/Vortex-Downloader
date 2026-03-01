@@ -41,18 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
         // Save to local history automatically
         await provider.saveToHistory(media);
 
-        // Immediate Navigation to PlayerScreen on success
         if (mounted) {
-          Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (_) => PlayerScreen(
-                media: media,
-                isAudioOnly:
-                    false, // Defaulting to video stream, can be toggleable later
-              ),
-            ),
-          );
+          _showOptionsSheet(media);
         }
       } else {
         _showError(provider.error ?? 'Failed to extract media data.');
@@ -60,6 +50,55 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (mounted) _showError(e.toString());
     }
+  }
+
+  void _showOptionsSheet(MediaItem media) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text('Options'),
+        message: Text(media.title),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            child: const Text(
+              'Stream Now',
+              style: TextStyle(color: CupertinoColors.activeBlue),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) =>
+                      PlayerScreen(media: media, isAudioOnly: false),
+                ),
+              );
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Download Video (4K/1080p)'),
+            onPressed: () {
+              Navigator.pop(context);
+              _downloadFile(media.videoUrl, 'mp4', media.title);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Download Audio (MP3)'),
+            onPressed: () {
+              Navigator.pop(context);
+              _downloadFile(media.audioUrl, 'mp3', media.title);
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cancel'),
+        ),
+      ),
+    );
   }
 
   Future<void> _downloadFile(
