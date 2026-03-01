@@ -48,15 +48,20 @@ async def extract_metadata(request: ExtractRequest):
         'Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
     ]
 
+    # Robutstness for Vercel (Read-only FS)
+    os.environ['HOME'] = '/tmp'
+    
     ydl_opts = {
         'quiet': True,
         'no_warnings': True,
         'format': 'bestvideo[height<=2160]+bestaudio/best', # up to 4K
         'sponsorblock_mark': 'all',
         'extract_flat': 'in_playlist',
-        'cachedir': False, # Critical for Vercel Read-only FS
+        'cachedir': False,
         'nocheckcertificate': True,
         'geo_bypass': True,
+        'noprogress': True,
+        'no_color': True,
         'extractor_args': {
             'youtube': {
                 'player_client': ['android', 'ios'],
@@ -71,10 +76,17 @@ async def extract_metadata(request: ExtractRequest):
         }
     }
 
-    # Only add cookiefile if it exists on disk (avoids Read-only FS error on Vercel)
-    cookie_path = os.path.join(os.path.dirname(__file__), 'cookies.txt')
-    if os.path.exists(cookie_path):
-        ydl_opts['cookiefile'] = cookie_path
+    # Cookie Strategy for Vercel: Copy to /tmp if exists
+    source_cookie = os.path.join(os.path.dirname(__file__), 'cookies.txt')
+    target_cookie = '/tmp/cookies.txt'
+    
+    if os.path.exists(source_cookie):
+        try:
+            import shutil
+            shutil.copy2(source_cookie, target_cookie)
+            ydl_opts['cookiefile'] = target_cookie
+        except Exception as e:
+            print(f"Warning: Could not copy cookies: {e}")
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
