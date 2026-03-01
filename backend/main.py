@@ -10,6 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "Vortex API is working!", "status": "online"}
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

@@ -21,7 +21,6 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -39,7 +38,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Now Playing', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Now Playing',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -57,13 +59,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   child: Image.network(
                     widget.media.thumbnail,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const SizedBox(),
+                    errorBuilder: (_, _, _) => const SizedBox(),
                   ),
                 ),
               Positioned.fill(
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
-                  child: Container(color: Colors.black.withOpacity(0.5)),
+                  child: Container(color: Colors.black.withValues(alpha: 0.5)),
                 ),
               ),
 
@@ -79,10 +81,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.5),
                               blurRadius: 30,
                               offset: const Offset(0, 20),
-                            )
+                            ),
                           ],
                         ),
                         child: ClipRRect(
@@ -91,7 +93,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               ? Image.network(
                                   widget.media.thumbnail,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_,__,___) => _buildPlaceholder(),
+                                  errorBuilder: (_, _, _) =>
+                                      _buildPlaceholder(),
                                 )
                               : _buildPlaceholder(),
                         ),
@@ -102,7 +105,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         child: Text(
                           widget.media.title,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -110,7 +117,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       const SizedBox(height: 8),
                       Text(
                         widget.media.artist,
-                        style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white.withValues(alpha: 0.7),
+                        ),
                       ),
                       const SizedBox(height: 50),
                       isLoading
@@ -120,9 +130,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               children: [
                                 IconButton(
                                   iconSize: 40,
-                                  icon: const Icon(CupertinoIcons.backward_fill, color: Colors.white),
+                                  icon: const Icon(
+                                    CupertinoIcons.backward_fill,
+                                    color: Colors.white,
+                                  ),
                                   onPressed: () {
-                                    player.seek(Duration(seconds: player.position.inSeconds - 10));
+                                    player.seek(
+                                      Duration(
+                                        seconds: player.position.inSeconds - 10,
+                                      ),
+                                    );
                                   },
                                 ),
                                 const SizedBox(width: 30),
@@ -133,7 +150,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   ),
                                   child: IconButton(
                                     iconSize: 50,
-                                    icon: Icon(isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill, color: Colors.black),
+                                    icon: Icon(
+                                      isPlaying
+                                          ? CupertinoIcons.pause_fill
+                                          : CupertinoIcons.play_fill,
+                                      color: Colors.black,
+                                    ),
                                     onPressed: () {
                                       playerManager.toggle();
                                     },
@@ -142,9 +164,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 const SizedBox(width: 30),
                                 IconButton(
                                   iconSize: 40,
-                                  icon: const Icon(CupertinoIcons.forward_fill, color: Colors.white),
+                                  icon: const Icon(
+                                    CupertinoIcons.forward_fill,
+                                    color: Colors.white,
+                                  ),
                                   onPressed: () {
-                                    player.seek(Duration(seconds: player.position.inSeconds + 10));
+                                    player.seek(
+                                      Duration(
+                                        seconds: player.position.inSeconds + 10,
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
@@ -163,7 +192,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Widget _buildPlaceholder() {
     return Container(
       color: const Color(0xFF1C1C1E),
-      child: const Icon(CupertinoIcons.music_note, size: 100, color: Colors.white54),
+      child: const Icon(
+        CupertinoIcons.music_note,
+        size: 100,
+        color: Colors.white54,
+      ),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:audio_session/audio_session.dart';
 import '../../features/media/domain/entities/media_item.dart';
 
 class GlobalPlayerManager extends ChangeNotifier {
@@ -10,7 +9,6 @@ class GlobalPlayerManager extends ChangeNotifier {
   MediaItem? _currentMedia;
   bool _isPlaying = false;
   bool _isLoading = false;
-  bool _isAudioOnly = false;
 
   GlobalPlayerManager._internal() {
     _initStreams();
@@ -24,15 +22,15 @@ class GlobalPlayerManager extends ChangeNotifier {
   void _initStreams() {
     _player.playerStateStream.listen((state) {
       _isPlaying = state.playing;
-      _isLoading = state.processingState == ProcessingState.loading ||
-                   state.processingState == ProcessingState.buffering;
+      _isLoading =
+          state.processingState == ProcessingState.loading ||
+          state.processingState == ProcessingState.buffering;
       notifyListeners();
     });
   }
 
   Future<void> playMedia(MediaItem media, {required bool isAudioOnly}) async {
     _currentMedia = media;
-    _isAudioOnly = isAudioOnly;
     notifyListeners();
 
     try {

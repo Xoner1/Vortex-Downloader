@@ -44,21 +44,26 @@ class _HomeScreenState extends State<HomeScreen> {
         message: Text(media.title),
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
-            child: const Text('Stream Now', style: TextStyle(color: CupertinoColors.activeBlue)),
+            child: const Text(
+              'Stream Now',
+              style: TextStyle(color: CupertinoColors.activeBlue),
+            ),
             onPressed: () async {
-              Navigator.pop(context);
+              // Get navigator before async work to avoid using context across async gaps
+              final navigator = Navigator.of(context);
 
               // Save to local history using provider
-              await Provider.of<MediaProvider>(context, listen: false).saveToHistory(media);
+              final provider = Provider.of<MediaProvider>(
+                context,
+                listen: false,
+              );
+              await provider.saveToHistory(media);
 
               if (mounted) {
-                Navigator.push(
-                  context,
+                navigator.push(
                   CupertinoPageRoute(
-                    builder: (_) => PlayerScreen(
-                      media: media,
-                      isAudioOnly: false,
-                    ),
+                    builder: (_) =>
+                        PlayerScreen(media: media, isAudioOnly: false),
                   ),
                 );
               }
@@ -90,7 +95,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _downloadFile(String downloadUrl, String ext, String title) async {
+  Future<void> _downloadFile(
+    String downloadUrl,
+    String ext,
+    String title,
+  ) async {
     if (downloadUrl.isEmpty) {
       _showError('URL not found for this format');
       return;
@@ -103,21 +112,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Clean title for filename
       final safeTitle = title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '');
-      final filename = "${safeTitle}_${DateTime.now().millisecondsSinceEpoch}.$ext";
+      final filename =
+          "${safeTitle}_${DateTime.now().millisecondsSinceEpoch}.$ext";
       final savePath = '${downloadDir.path}/$filename';
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Downloading started in background...'), backgroundColor: Color(0xFF1C1C1E)),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Downloading started in background...'),
+            backgroundColor: Color(0xFF1C1C1E),
+          ),
+        );
+      }
 
       // Using Dio for download
-      Dio().download(downloadUrl, savePath).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text('Download Complete! Saved to: $filename'), backgroundColor: const Color(0xFF30D158)),
-        );
-      }).catchError((e) {
-        _showError('Download Failed: $e');
-      });
+      Dio()
+          .download(downloadUrl, savePath)
+          .then((_) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Download Complete! Saved to: $filename'),
+                  backgroundColor: const Color(0xFF30D158),
+                ),
+              );
+            }
+          })
+          .catchError((e) {
+            if (mounted) {
+              _showError('Download Failed: $e');
+            }
+          });
     } catch (e) {
       _showError(e.toString());
     }
@@ -125,7 +150,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message, style: const TextStyle(color: Colors.white)), backgroundColor: Colors.redAccent)
+      SnackBar(
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.redAccent,
+      ),
     );
   }
 
@@ -136,8 +164,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Discover', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.black.withOpacity(0.8),
+        title: const Text(
+          'Discover',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.black.withValues(alpha: 0.8),
         elevation: 0,
         flexibleSpace: ClipRect(
           child: BackdropFilter(
@@ -158,13 +189,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: InputDecoration(
                   hintText: 'Paste Video URL...',
                   hintStyle: const TextStyle(color: Colors.white54),
-                  prefixIcon: const Icon(CupertinoIcons.link, color: Colors.white54),
+                  prefixIcon: const Icon(
+                    CupertinoIcons.link,
+                    color: Colors.white54,
+                  ),
                   suffixIcon: isLoading
-                    ? const Padding(padding: EdgeInsets.all(12), child: CupertinoActivityIndicator())
-                    : IconButton(
-                        icon: const Icon(CupertinoIcons.clear_circled_solid, color: Colors.white54),
-                        onPressed: () => _urlController.clear(),
-                      ),
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: CupertinoActivityIndicator(),
+                        )
+                      : IconButton(
+                          icon: const Icon(
+                            CupertinoIcons.clear_circled_solid,
+                            color: Colors.white54,
+                          ),
+                          onPressed: () => _urlController.clear(),
+                        ),
                 ),
                 textDirection: TextDirection.ltr,
                 onSubmitted: (_) => _processUrl(),
@@ -178,9 +218,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: const Color(0xFF0A84FF),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                  child: const Text('Search & Extract', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  child: const Text(
+                    'Search & Extract',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ],

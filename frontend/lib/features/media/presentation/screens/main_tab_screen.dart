@@ -25,19 +25,16 @@ class _MainTabScreenState extends State<MainTabScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true, // Needed for floating transparent nav bar
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.transparent,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 20,
               spreadRadius: 5,
-            )
+            ),
           ],
         ),
         child: ClipRRect(
@@ -45,7 +42,9 @@ class _MainTabScreenState extends State<MainTabScreen> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
             child: BottomNavigationBar(
-              backgroundColor: const Color(0xFF1C1C1E).withOpacity(0.7), // Glassmorphism
+              backgroundColor: const Color(
+                0xFF1C1C1E,
+              ).withValues(alpha: 0.7), // Glassmorphism
               selectedItemColor: const Color(0xFF0A84FF),
               unselectedItemColor: Colors.white54,
               showSelectedLabels: true,

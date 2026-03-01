@@ -28,8 +28,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Local Library', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.black.withOpacity(0.8),
+        title: const Text(
+          'Local Library',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.black.withValues(alpha: 0.8),
         elevation: 0,
         flexibleSpace: ClipRect(
           child: BackdropFilter(
@@ -45,7 +48,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
           }
 
           if (provider.history.isEmpty) {
-            return const Center(child: Text('No History Found.', style: TextStyle(color: Colors.white54)));
+            return const Center(
+              child: Text(
+                'No History Found.',
+                style: TextStyle(color: Colors.white54),
+              ),
+            );
           }
 
           return ListView.builder(
@@ -54,10 +62,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
             itemBuilder: (context, index) {
               final item = provider.history[index];
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: ListTile(
@@ -70,36 +81,49 @@ class _LibraryScreenState extends State<LibraryScreen> {
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                              errorBuilder: (_, _, _) => _buildPlaceholder(),
                             )
                           : _buildPlaceholder(),
                     ),
                     title: Text(
                       item.title,
-                      style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     subtitle: Text(
                       item.artist,
-                      style: TextStyle(color: Colors.white.withOpacity(0.6)),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     trailing: IconButton(
-                      icon: const Icon(CupertinoIcons.trash, color: Colors.redAccent),
+                      icon: const Icon(
+                        CupertinoIcons.trash,
+                        color: Colors.redAccent,
+                      ),
                       onPressed: () {
                         provider.removeFromHistory(item.id);
                       },
                     ),
                     onTap: () {
-                       showCupertinoModalPopup(
+                      showCupertinoModalPopup(
                         context: context,
                         builder: (BuildContext context) => CupertinoActionSheet(
                           title: const Text('Play from History'),
                           actions: <CupertinoActionSheetAction>[
                             CupertinoActionSheetAction(
-                              child: const Text('Stream Now', style: TextStyle(color: CupertinoColors.activeBlue)),
+                              child: const Text(
+                                'Stream Now',
+                                style: TextStyle(
+                                  color: CupertinoColors.activeBlue,
+                                ),
+                              ),
                               onPressed: () {
                                 Navigator.pop(context);
                                 Navigator.push(

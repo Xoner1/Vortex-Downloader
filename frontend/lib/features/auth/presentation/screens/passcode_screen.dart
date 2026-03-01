@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../media/presentation/screens/main_tab_screen.dart'; // To navigate to MainTabScreen
 
@@ -58,7 +56,12 @@ class _PasscodeScreenState extends State<PasscodeScreen> {
               _input = '';
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Incorrect Passcode', textAlign: TextAlign.center)),
+              const SnackBar(
+                content: Text(
+                  'Incorrect Passcode',
+                  textAlign: TextAlign.center,
+                ),
+              ),
             );
           }
         }
@@ -84,7 +87,11 @@ class _PasscodeScreenState extends State<PasscodeScreen> {
           children: [
             Text(
               _isSettingUp ? 'Set a 4-Digit Passcode' : 'Enter Passcode',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 40),
             Row(
@@ -96,7 +103,9 @@ class _PasscodeScreenState extends State<PasscodeScreen> {
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: index < _input.length ? const Color(0xFF0A84FF) : Colors.grey.withOpacity(0.3),
+                    color: index < _input.length
+                        ? const Color(0xFF0A84FF)
+                        : Colors.grey.withValues(alpha: 0.3),
                   ),
                 );
               }),
@@ -140,13 +149,17 @@ class _PasscodeScreenState extends State<PasscodeScreen> {
         height: 75,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: const Color(0xFF1C1C1E).withOpacity(0.8),
+          color: const Color(0xFF1C1C1E).withValues(alpha: 0.8),
           border: Border.all(color: Colors.white12, width: 0.5),
         ),
         alignment: Alignment.center,
         child: Text(
           label,
-          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w400, color: Colors.white),
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
         ),
       ),
     );

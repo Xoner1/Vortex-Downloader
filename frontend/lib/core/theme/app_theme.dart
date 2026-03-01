@@ -9,14 +9,14 @@ class AppTheme {
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFF0A84FF),
         secondary: Color(0xFF30D158), // iOS Green
-        background: Color(0xFF000000),
-        surface: Color(0xFF1C1C1E), // iOS Secondary System Fill
+        surface: Color(0xFF000000),
+        onSurface: Colors.white,
       ),
       textTheme: GoogleFonts.cairoTextTheme(
         ThemeData.dark().textTheme.apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
-            ),
+          bodyColor: Colors.white,
+          displayColor: Colors.white,
+        ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -40,7 +40,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
       ),
     );
   }
