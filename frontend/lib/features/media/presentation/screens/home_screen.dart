@@ -62,65 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _showOptionsSheet(MediaItem media) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => CupertinoActionSheet(
-        title: const Text('Options'),
-        message: Text(media.title),
-        actions: <CupertinoActionSheetAction>[
-          CupertinoActionSheetAction(
-            child: const Text(
-              'Stream Now',
-              style: TextStyle(color: CupertinoColors.activeBlue),
-            ),
-            onPressed: () async {
-              // Get navigator before async work to avoid using context across async gaps
-              final navigator = Navigator.of(context);
-
-              // Save to local history using provider
-              final provider = Provider.of<MediaProvider>(
-                context,
-                listen: false,
-              );
-              await provider.saveToHistory(media);
-
-              if (mounted) {
-                navigator.push(
-                  CupertinoPageRoute(
-                    builder: (_) =>
-                        PlayerScreen(media: media, isAudioOnly: false),
-                  ),
-                );
-              }
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: const Text('Download Video (4K/1080p)'),
-            onPressed: () {
-              Navigator.pop(context);
-              _downloadFile(media.videoUrl, 'mp4', media.title);
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: const Text('Download Audio (MP3)'),
-            onPressed: () {
-              Navigator.pop(context);
-              _downloadFile(media.audioUrl, 'mp3', media.title);
-            },
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDefaultAction: true,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Cancel'),
-        ),
-      ),
-    );
-  }
-
   Future<void> _downloadFile(
     String downloadUrl,
     String ext,

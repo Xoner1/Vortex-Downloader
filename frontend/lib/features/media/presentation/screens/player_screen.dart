@@ -107,7 +107,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           widget.media.title,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                          style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
@@ -122,10 +121,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         widget.media.artist,
                         style: const TextStyle(
                           fontSize: 20,
-                          color: Color(0xFF0A84FF), // iOS App Store accent for artist
+                          color: Color(
+                            0xFF0A84FF,
+                          ), // iOS App Store accent for artist
                           fontWeight: FontWeight.w500,
-                        ),
-                      ),
                         ),
                       ),
                       const SizedBox(height: 50),
