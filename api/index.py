@@ -56,6 +56,7 @@ async def extract_metadata(request: ExtractRequest):
         'nocheckcertificate': True,
         'geo_bypass': True,
         'extract_flat': 'in_playlist',
+        'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt'),
         'extractor_args': {
             'youtube': {
                 'player_client': ['android', 'ios'],
