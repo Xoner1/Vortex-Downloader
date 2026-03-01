@@ -4,3 +4,5 @@ frontend/
 build/
 android/
 ios/
+.git/
+node_modules/

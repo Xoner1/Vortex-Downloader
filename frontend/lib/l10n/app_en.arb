@@ -1,0 +1,25 @@
+{
+  "@@locale": "en",
+  "appTitle": "Vortex Downloader",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "enterPasscode": "Enter Passcode",
+  "unlock": "UNLOCK",
+  "incorrectPasscode": "Incorrect Passcode!",
+  "pasteLinkOrSearch": "Paste Link or Search...",
+  "ready": "Ready",
+  "initializing": "Initializing...",
+  "pleaseEnterUrl": "Please enter a URL!",
+  "downloading": "Downloading...",
+  "failedToStart": "Failed to start download",
+  "failedToConnect": "Failed to connect to backend.",
+  "webSocketError": "WebSocket Error",
+  "chooseFolder": "Choose Folder",
+  "startDownload": "START DOWNLOAD",
+  "speed": "SPEED",
+  "size": "SIZE",
+  "video": "VIDEO",
+  "audio": "AUDIO",
+  "settings": "Settings"
+}
