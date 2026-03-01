@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,14 +29,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final provider = Provider.of<MediaProvider>(context, listen: false);
 
-    // Fallback if provider silently fails to capture error
     try {
+      // Haptic Feedback for Apple Polish
+      HapticFeedback.lightImpact();
+
       final media = await provider.extractMedia(url);
 
       if (!mounted) return;
 
       if (media != null) {
-        _showOptionsSheet(media);
+        // Save to local history automatically
+        await provider.saveToHistory(media);
+
+        // Immediate Navigation to PlayerScreen on success
+        if (mounted) {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => PlayerScreen(
+                media: media,
+                isAudioOnly: false, // Defaulting to video stream, can be toggleable later
+              ),
+            ),
+          );
+        }
       } else {
         _showError(provider.error ?? 'Failed to extract media data.');
       }

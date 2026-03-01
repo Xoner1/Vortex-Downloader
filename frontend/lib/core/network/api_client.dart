@@ -9,18 +9,9 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          // Robust Browser Headers to bypass Vercel/YouTube 401s
-          options.headers.addAll({
-            'User-Agent': _getRandomSafariUserAgent(),
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Connection': 'keep-alive',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'cross-site',
-            'Origin': baseUrl,
-            'Referer': '$baseUrl/',
-          });
+          // Simplified headers after Vercel protection disabled
+          // Keeping User-Agent to help yt-dlp
+          options.headers['User-Agent'] = _getRandomSafariUserAgent();
           return handler.next(options);
         },
       ),
