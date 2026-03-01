@@ -1,139 +1,90 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:frontend/presentation/screens/home_screen.dart';
-import 'package:frontend/presentation/screens/downloads_screen.dart';
-import 'package:frontend/presentation/screens/history_screen.dart';
-import 'package:frontend/presentation/screens/passcode_screen.dart';
-import 'dart:ui';
+import 'package:audio_session/audio_session.dart';
+
+import 'package:frontend/core/theme/app_theme.dart';
+import 'package:frontend/features/auth/presentation/screens/passcode_screen.dart';
+import 'package:frontend/core/audio/global_player_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const VortexApp());
+
+  // Audio Session Setup: TikTok/Call Interruption Logic
+  await _initAudioSession();
+
+  // Local Storage Initialization (sqflite handled by Repositories later)
+
+  runApp(const VortexProApp());
 }
 
-class VortexApp extends StatelessWidget {
-  const VortexApp({super.key});
+/// Strict AudioSession implementation enforcing background playback
+/// and auto-ducking/pausing for phone calls, TikTok, WhatsApp, etc.
+Future<void> _initAudioSession() async {
+  final session = await AudioSession.instance;
+  await session.configure(const AudioSessionConfiguration(
+    avAudioSessionCategory: AVAudioSessionCategory.playback, // Essential for iOS background
+    avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.mixWithOthers,
+    avAudioSessionMode: AVAudioSessionMode.defaultMode,
+    avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
+    avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+    androidAudioAttributes: AndroidAudioAttributes(
+      contentType: AndroidAudioContentType.music,
+      usage: AndroidAudioUsage.media,
+    ),
+    androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+    androidWillPauseWhenDucked: true, // Crucial for auto-pause when TikTok opens
+  ));
+
+  // Listen to focus changes actively
+  session.interruptionEventStream.listen((event) {
+    if (event.begin) {
+      switch (event.type) {
+        case AudioInterruptionType.duck:
+          // Temporary interruption (e.g., notification) -> Volume drops
+          break;
+        case AudioInterruptionType.pause:
+        case AudioInterruptionType.unknown:
+          // Phone call or TikTok starts -> Player must pause
+          GlobalPlayerManager.instance.pause();
+          break;
+      }
+    } else {
+      switch (event.type) {
+        case AudioInterruptionType.duck:
+          // Volume normalizes
+          break;
+        case AudioInterruptionType.pause:
+          // Call ended, or user closed TikTok -> Auto-Resume
+          GlobalPlayerManager.instance.play();
+          break;
+        case AudioInterruptionType.unknown:
+          break;
+      }
+    }
+  });
+}
+
+class VortexProApp extends StatelessWidget {
+  const VortexProApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Vortex Stream Pro',
-      theme: ThemeData.dark().copyWith(
-        primaryColor: const Color(0xFF0A84FF), // iOS Blue
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF0A84FF),
-          secondary: Color(0xFF30D158), // iOS Green
-        ),
-        scaffoldBackgroundColor: const Color(0xFF000000), // Deep Black
-        textTheme: GoogleFonts.cairoTextTheme(
-          ThemeData.dark().textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: true,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1C1C1E), // iOS Secondary System Fill
-            foregroundColor: const Color(0xFF0A84FF),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: const Color(0xFF1C1C1E),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
-      home: const PasscodeScreen(),
+      theme: AppTheme.darkTheme,
+      home: const PasscodeScreen(), // Entry point -> Features/Auth
       debugShowCheckedModeBanner: false,
+
+      // Global Localizations (Arabic RTL & English LTR)
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', ''),
-        Locale('ar', ''),
+        Locale('en', ''), // English
+        Locale('ar', ''), // Arabic
       ],
-    );
-  }
-}
-
-class MainTabScreen extends StatefulWidget {
-  const MainTabScreen({super.key});
-
-  @override
-  State<MainTabScreen> createState() => _MainTabScreenState();
-}
-
-class _MainTabScreenState extends State<MainTabScreen> {
-  int _currentIndex = 0;
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const HistoryScreen(),
-    const DownloadsScreen(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true, // Needed for floating transparent nav bar
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 20,
-              spreadRadius: 5,
-            )
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-            child: BottomNavigationBar(
-              backgroundColor: const Color(0xFF1C1C1E).withOpacity(0.7), // Glassmorphism
-              selectedItemColor: const Color(0xFF0A84FF),
-              unselectedItemColor: Colors.white54,
-              showSelectedLabels: true,
-              showUnselectedLabels: false,
-              currentIndex: _currentIndex,
-              onTap: (index) => setState(() => _currentIndex = index),
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.search),
-                  label: 'Discover',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.music_albums),
-                  label: 'Library',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.cloud_download),
-                  label: 'Downloads',
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
