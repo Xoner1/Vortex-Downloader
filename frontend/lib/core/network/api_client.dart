@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'dart:math';
+import '../constants.dart';
 
 class ApiClient {
-  static const String baseUrl = 'https://vortex-downloader-nh6sa471q-xoner1s-projects.vercel.app';
   final Dio _dio;
 
   ApiClient() : _dio = Dio(BaseOptions(baseUrl: baseUrl)) {

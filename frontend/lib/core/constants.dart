@@ -1,1 +1,1 @@
-const String baseUrl = "http://192.168.0.53:8000";
+const String baseUrl = "https://vortex-downloader.vercel.app";

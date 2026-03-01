@@ -52,9 +52,15 @@ async def extract_metadata(request: ExtractRequest):
         'quiet': True,
         'no_warnings': True,
         'format': 'bestvideo[height<=2160]+bestaudio/best', # up to 4K
-        'sponsorblock_mark': 'all', # SponsorBlock support
+        'sponsorblock_mark': 'all',
+        'nocheckcertificate': True,
+        'geo_bypass': True,
+        'extract_flat': 'in_playlist',
         'http_headers': {
             'User-Agent': random.choice(user_agents),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Sec-Fetch-Mode': 'navigate',
         }
     }
 
