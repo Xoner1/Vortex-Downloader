@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
+import 'package:flutter/services.dart';
 
 import '../../../../core/audio/global_player_manager.dart';
 import '../../domain/entities/media_item.dart';
@@ -106,9 +107,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           widget.media.title,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
                             color: Colors.white,
+                            letterSpacing: -0.5,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -117,9 +120,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       const SizedBox(height: 8),
                       Text(
                         widget.media.artist,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white.withValues(alpha: 0.7),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF0A84FF), // iOS App Store accent for artist
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                         ),
                       ),
                       const SizedBox(height: 50),
@@ -157,6 +163,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       color: Colors.black,
                                     ),
                                     onPressed: () {
+                                      HapticFeedback.lightImpact();
                                       playerManager.toggle();
                                     },
                                   ),
