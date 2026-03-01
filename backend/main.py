@@ -1,13 +1,11 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel
-import asyncio
-from typing import Dict
+import os
 import uuid
 import sys
-import os
-
-from core.downloader import VortexDownloader
-from environment import get_ffmpeg_path
+import yt_dlp
+import time
+import random
+from fastapi import FastAPI
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -20,78 +18,73 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class DownloadRequest(BaseModel):
+class ExtractRequest(BaseModel):
     url: str
-    path: str
-    mode: str
-    quality: str
 
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: Dict[str, WebSocket] = {}
+# Smart Caching for /api/extract
+extract_cache = {}
+CACHE_TTL = 3600  # 1 hour
 
-    async def connect(self, task_id: str, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections[task_id] = websocket
+def clean_cache():
+    current_time = time.time()
+    keys_to_delete = [k for k, v in extract_cache.items() if current_time - v['timestamp'] > CACHE_TTL]
+    for k in keys_to_delete:
+        del extract_cache[k]
 
-    def disconnect(self, task_id: str):
-        if task_id in self.active_connections:
-            del self.active_connections[task_id]
+@app.post("/api/extract")
+async def extract_metadata(request: ExtractRequest):
+    clean_cache()
+    if request.url in extract_cache:
+        return extract_cache[request.url]['data']
 
-    async def send_personal_message(self, message: str, task_id: str):
-        if task_id in self.active_connections:
-            await self.active_connections[task_id].send_text(message)
+    user_agents = [
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+        'Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    ]
 
-    async def send_personal_json(self, data: dict, task_id: str):
-        if task_id in self.active_connections:
-            await self.active_connections[task_id].send_json(data)
+    ydl_opts = {
+        'quiet': True,
+        'no_warnings': True,
+        'format': 'bestvideo[height<=2160]+bestaudio/best', # up to 4K
+        'sponsorblock_mark': 'all', # SponsorBlock support
+        'http_headers': {
+            'User-Agent': random.choice(user_agents),
+        }
+    }
 
-manager = ConnectionManager()
-download_tasks = {}
-
-# Global queue to receive events from all downloaders
-progress_queue = asyncio.Queue()
-
-async def process_queue():
-    while True:
-        try:
-            event = await progress_queue.get()
-            task_id = event.get("task_id")
-            if task_id not in manager.active_connections:
-                continue
-
-            if event["type"] == "progress":
-                await manager.send_personal_json(event["data"], task_id)
-            elif event["type"] == "status":
-                await manager.send_personal_json({"status_msg": event["data"]}, task_id)
-        except Exception as e:
-            print(f"Error sending progress: {e}")
-
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(process_queue())
-
-@app.post("/api/download")
-async def start_download(request: DownloadRequest):
-    task_id = str(uuid.uuid4())
-
-    ffmpeg_bin = get_ffmpeg_path()
-    if not os.path.exists(ffmpeg_bin) and ffmpeg_bin != "ffmpeg":
-        pass # Letyt-dlp use default or try to find it
-
-    downloader = VortexDownloader(task_id=task_id, progress_queue=progress_queue)
-    download_tasks[task_id] = downloader
-
-    downloader.start(request.url, request.path, request.mode, request.quality, ffmpeg_bin)
-
-    return {"message": "Download started", "task_id": task_id}
-
-@app.websocket("/ws/progress/{task_id}")
-async def websocket_endpoint(websocket: WebSocket, task_id: str):
-    await manager.connect(task_id, websocket)
     try:
-        while True:
-            # We keep the connection alive to send messages from the queue
-            data = await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(task_id)
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(request.url, download=False)
+
+            # Extract essential data to save bandwidth/memory
+            formats = info.get('formats', [])
+            audio_url = None
+            video_url = None
+
+            for f in formats:
+                if f.get('vcodec') == 'none' and f.get('acodec') != 'none':
+                    audio_url = f.get('url')
+                if f.get('vcodec') != 'none' and f.get('height') == 1080:
+                    video_url = f.get('url')
+
+            if not video_url:
+                video_url = info.get('url') # fallback
+
+            result = {
+                "title": info.get('title'),
+                "artist": info.get('channel', info.get('uploader')),
+                "thumbnail": info.get('thumbnail'),
+                "duration": info.get('duration'),
+                "audio_url": audio_url,
+                "video_url": video_url,
+                "chapters": info.get('chapters', []) # SponsorBlock chapters
+            }
+
+            extract_cache[request.url] = {
+                'data': result,
+                'timestamp': time.time()
+            }
+            return result
+    except Exception as e:
+        return {"error": str(e)}
